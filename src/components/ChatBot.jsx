@@ -9,7 +9,7 @@ export default function ChatBot() {
   const [language, setLanguage] = useState("English");
 
   async function handleAsk() {
-    if (!question.trim()) return;
+    if (!question.trim() || loading) return;
 
     setLoading(true);
     setAnswer("");
@@ -79,73 +79,308 @@ ${question}
 
     try {
       const result = await askGemini(prompt);
-      setAnswer(result);
+
+      if (result) {
+        setAnswer(result);
+      } else {
+        setAnswer(
+          "❌ No response was received. Please try again."
+        );
+      }
     } catch (error) {
-      setAnswer("❌ Something went wrong. Please try again.");
+      console.error("Chat Error:", error);
+
+      setAnswer(
+        "❌ Something went wrong. Please try again."
+      );
     }
 
     setLoading(false);
   }
 
+  function handleKeyDown(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleAsk();
+    }
+  }
+
+  function clearChat() {
+    setQuestion("");
+    setAnswer("");
+  }
+
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="sb-chat-container">
 
-      {/* Language */}
+      {/* =================================
+          AI HEADER
+      ================================= */}
 
-      <div className="mb-6">
-        <label className="block text-lg font-semibold mb-2">
-          🌐 Select Language
+      <div className="sb-chat-header">
+
+        <div className="sb-chat-avatar">
+          🤖
+        </div>
+
+        <div className="sb-chat-header-text">
+
+          <div className="sb-chat-title">
+            Smart Bharat AI
+            <span className="sb-online-dot"></span>
+          </div>
+
+          <p>
+            Your AI assistant for Indian government services
+          </p>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================
+          LANGUAGE
+      ================================= */}
+
+      <div className="sb-language-section">
+
+        <label>
+          🌐 Response Language
         </label>
 
         <select
           value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          className="w-full rounded-xl border-2 border-blue-200 p-3 outline-none focus:border-blue-500"
+          onChange={(event) =>
+            setLanguage(event.target.value)
+          }
         >
-          <option>English</option>
-          <option>Hindi</option>
-          <option>Marathi</option>
+          <option value="English">English</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Marathi">Marathi</option>
         </select>
+
       </div>
 
-      {/* Question */}
 
-      <textarea
-        rows={5}
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        placeholder="Example: How do I apply for a PAN Card?"
-        className="w-full rounded-xl border-2 border-blue-200 p-4 text-lg shadow-sm outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-200"
-      />
+      {/* =================================
+          QUESTION
+      ================================= */}
 
-      <button
-        onClick={handleAsk}
-        disabled={loading}
-        className="mt-5 w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-blue-700 hover:scale-[1.02] disabled:bg-blue-400"
-      >
-        {loading ? "🤖 Thinking..." : "🚀 Ask Smart Bharat"}
-      </button>
+      <div className="sb-question-section">
 
-      {answer && (
-        <div className="mt-8 rounded-3xl border border-blue-200 bg-blue-50 p-8 shadow-lg">
+        <label>
+          💬 Ask your question
+        </label>
 
-          <h3 className="mb-6 text-2xl font-bold text-blue-700">
-            🤖 Smart Bharat Response
-          </h3>
+        <div className="sb-input-wrapper">
 
-          <div className="max-h-[450px] overflow-y-auto rounded-2xl border border-blue-200 bg-white p-6 shadow-inner">
+          <textarea
+            rows={4}
+            value={question}
+            onChange={(event) =>
+              setQuestion(event.target.value)
+            }
+            onKeyDown={handleKeyDown}
+            placeholder="Example: How do I apply for a PAN Card?"
+            disabled={loading}
+          />
 
-            <div className="prose max-w-none prose-headings:text-blue-700 prose-headings:font-bold prose-ul:list-disc prose-ol:list-decimal prose-li:my-2 prose-p:my-2">
+          <div className="sb-input-footer">
 
-              <ReactMarkdown>
+            <span>
+              {question.length}/500
+            </span>
+
+            <span>
+              Press Enter to ask
+            </span>
+
+          </div>
+
+        </div>
+
+        {/* Buttons */}
+
+        <div className="sb-chat-actions">
+
+          <button
+            type="button"
+            className="sb-clear-chat"
+            onClick={clearChat}
+            disabled={!question && !answer}
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            className="sb-ask-button"
+            onClick={handleAsk}
+            disabled={loading || !question.trim()}
+          >
+
+            {loading ? (
+              <>
+                <span className="sb-spinner"></span>
+                Thinking...
+              </>
+            ) : (
+              <>
+                ✦ Ask Smart Bharat
+                <span>→</span>
+              </>
+            )}
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================
+          LOADING
+      ================================= */}
+
+      {loading && (
+
+        <div className="sb-thinking-card">
+
+          <div className="sb-thinking-icon">
+            🤖
+          </div>
+
+          <div>
+            <strong>
+              Smart Bharat AI is thinking...
+            </strong>
+
+            <p>
+              Finding the most useful information for you.
+            </p>
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =================================
+          USER QUESTION
+      ================================= */}
+
+      {answer && !loading && (
+
+        <div className="sb-conversation">
+
+          <div className="sb-user-message">
+
+            <div className="sb-message-label">
+              <span>👤</span>
+              You asked
+            </div>
+
+            <p>
+              {question}
+            </p>
+
+          </div>
+
+
+          {/* =================================
+              AI RESPONSE
+          ================================= */}
+
+          <div className="sb-ai-response">
+
+            <div className="sb-ai-response-header">
+
+              <div className="sb-ai-icon">
+                🤖
+              </div>
+
+              <div>
+                <strong>
+                  Smart Bharat AI
+                </strong>
+
+                <span>
+                  AI Generated Response
+                </span>
+              </div>
+
+            </div>
+
+
+            <div className="sb-ai-content">
+
+              <ReactMarkdown
+                components={{
+                  h1: ({ children }) => (
+                    <h2 className="sb-ai-heading">
+                      {children}
+                    </h2>
+                  ),
+
+                  h2: ({ children }) => (
+                    <h2 className="sb-ai-heading">
+                      {children}
+                    </h2>
+                  ),
+
+                  h3: ({ children }) => (
+                    <h3 className="sb-ai-heading">
+                      {children}
+                    </h3>
+                  ),
+
+                  p: ({ children }) => (
+                    <p className="sb-ai-text">
+                      {children}
+                    </p>
+                  ),
+
+                  ul: ({ children }) => (
+                    <ul className="sb-ai-list">
+                      {children}
+                    </ul>
+                  ),
+
+                  ol: ({ children }) => (
+                    <ol className="sb-ai-list">
+                      {children}
+                    </ol>
+                  ),
+
+                  li: ({ children }) => (
+                    <li>{children}</li>
+                  ),
+
+                  a: ({ children, href }) => (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
                 {answer}
               </ReactMarkdown>
 
             </div>
 
+            <div className="sb-ai-footer">
+              🇮🇳 Smart Bharat • Powered by Artificial Intelligence
+            </div>
+
           </div>
 
         </div>
+
       )}
 
     </div>

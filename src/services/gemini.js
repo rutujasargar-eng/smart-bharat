@@ -1,89 +1,81 @@
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-});
-
-// --------------------
-// Chatbot
-// --------------------
+// ==========================
+// AI CHAT
+// ==========================
 
 export async function askGemini(prompt) {
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
+    const response = await fetch("http://localhost:5000/api/chat", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        prompt,
+      }),
     });
 
-    return response.text;
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "AI request failed");
+    }
+
+    return data.response;
+
   } catch (error) {
-    console.error(error);
-    return "Something went wrong.";
+
+    console.error("Gemini Chat Error:", error);
+
+    return "Something went wrong. Please try again.";
   }
 }
 
-// --------------------
-// Image Complaint Generator
-// --------------------
 
-export async function analyzeComplaintImage(base64Image, mimeType) {
+// ==========================
+// IMAGE COMPLAINT ANALYSIS
+// ==========================
+
+export async function analyzeComplaintImage(
+  base64Image,
+  mimeType
+) {
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: `
-You are Smart Bharat AI.
 
-Analyze this uploaded civic issue image.
+    const response = await fetch(
+      "http://localhost:5000/api/analyze-image",
+      {
+        method: "POST",
 
-Return ONLY Markdown.
-
-Use exactly this format:
-
-# 🚨 Issue
-
-...
-
-# 🏢 Department
-
-...
-
-# 🔥 Priority
-
-Low / Medium / High
-
-# 📝 Complaint
-
-Write a professional complaint in 60-80 words.
-
-# 💡 Suggested Action
-
-One short suggestion.
-`,
-            },
-            {
-              inlineData: {
-                mimeType: mimeType,
-                data: base64Image,
-              },
-            },
-          ],
+        headers: {
+          "Content-Type": "application/json",
         },
-      ],
-    });
 
-    return response.text;
+        body: JSON.stringify({
+          image: base64Image,
+          mimeType,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Image analysis failed"
+      );
+    }
+
+    return data.response;
+
   } catch (error) {
-    console.error(error);
+
+    console.error(
+      "Gemini Image Analysis Error:",
+      error
+    );
+
     return "Unable to analyze image.";
   }
 }

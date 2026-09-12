@@ -1,47 +1,80 @@
-function Navbar() {
+function Navbar({ page, setPage }) {
+
+  const navItems = [
+    {
+      id: "home",
+      label: "Home",
+      icon: "⌂",
+    },
+    {
+      id: "assistant",
+      label: "AI Assistant",
+      icon: "✦",
+    },
+    {
+      id: "complaint",
+      label: "Report Issue",
+      icon: "⚠",
+    },
+    {
+      id: "history",
+      label: "History",
+      icon: "▣",
+    },
+    {
+      id: "about",
+      label: "About",
+      icon: "ⓘ",
+    },
+  ];
+
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className="navbar">
 
-      <nav className="max-w-7xl mx-auto py-5 px-6">
+      <div className="navbar-inner">
 
-        <div className="text-center">
-
-          <h1 className="text-5xl font-extrabold text-blue-700">
-            🇮🇳 Smart Bharat
-          </h1>
-
-          <p className="mt-2 text-xl font-medium text-gray-600">
-            AI Powered Civic Companion
-          </p>
-
-          <div className="mt-6 flex flex-wrap justify-center gap-5">
-
-            <button
-              onClick={() => document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth" })}
-              className="rounded-xl bg-blue-600 px-6 py-3 text-white font-bold shadow hover:bg-blue-700 transition"
-            >
-              🤖 AI Assistant
-            </button>
-
-            <button
-              onClick={() => document.getElementById("complaint")?.scrollIntoView({ behavior: "smooth" })}
-              className="rounded-xl bg-green-600 px-6 py-3 text-white font-bold shadow hover:bg-green-700 transition"
-            >
-              📷 Complaint Generator
-            </button>
-
-            <button
-              onClick={() => document.getElementById("history")?.scrollIntoView({ behavior: "smooth" })}
-              className="rounded-xl bg-purple-600 px-6 py-3 text-white font-bold shadow hover:bg-purple-700 transition"
-            >
-              📜 History
-            </button>
-
+        {/* Logo */}
+        <button
+          className="brand"
+          onClick={() => setPage("home")}
+        >
+          <div className="brand-logo">
+            🇮🇳
           </div>
 
+          <div className="brand-text">
+            <span className="brand-name">Smart Bharat</span>
+            <span className="brand-tagline">
+              AI Civic Platform
+            </span>
+          </div>
+        </button>
+
+        {/* Navigation */}
+        <nav className="nav-links">
+
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setPage(item.id)}
+              className={`nav-item ${
+                page === item.id ? "active" : ""
+              }`}
+            >
+              <span>{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+
+        </nav>
+
+        {/* Status */}
+        <div className="nav-status">
+          <span className="status-dot"></span>
+          AI Online
         </div>
 
-      </nav>
+      </div>
 
     </header>
   );

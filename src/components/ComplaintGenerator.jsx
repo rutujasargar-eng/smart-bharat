@@ -19,9 +19,10 @@ export default function ComplaintGenerator() {
   }
 
   async function analyzeImage() {
-    if (!image) return;
+    if (!image || loading) return;
 
     setLoading(true);
+    setResult("");
 
     const reader = new FileReader();
 
@@ -36,7 +37,8 @@ export default function ComplaintGenerator() {
 
         setResult(response);
       } catch (err) {
-        setResult("❌ Failed to analyze image.");
+        console.error(err);
+        setResult("❌ Failed to analyze image. Please try again.");
       }
 
       setLoading(false);
@@ -68,6 +70,8 @@ export default function ComplaintGenerator() {
   }
 
   function saveComplaint() {
+    if (!result) return;
+
     const history =
       JSON.parse(localStorage.getItem("complaints")) || [];
 
@@ -82,110 +86,315 @@ export default function ComplaintGenerator() {
       JSON.stringify(history)
     );
 
-    window.dispatchEvent(new Event("complaintsUpdated"));
+    window.dispatchEvent(
+      new Event("complaintsUpdated")
+    );
 
     alert("✅ Complaint Saved!");
   }
 
+  function resetGenerator() {
+    setImage(null);
+    setPreview(null);
+    setResult("");
+  }
+
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="sb-complaint-generator">
 
-      {/* Upload Box */}
+      {/* =========================================
+          UPLOAD SECTION
+      ========================================= */}
 
-      <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-green-300 bg-green-50 p-8 text-center transition hover:bg-green-100">
+      {!preview && (
 
-        <div className="mb-3 text-5xl">📷</div>
+        <label className="sb-upload-box">
 
-        <p className="text-lg font-semibold text-green-700">
-          Click to Upload Image
-        </p>
+          <div className="sb-upload-icon">
+            📷
+          </div>
 
-        <p className="mt-2 text-sm text-gray-500">
-          JPG, PNG or JPEG
-        </p>
-
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImage}
-          className="hidden"
-        />
-
-      </label>
-
-      {/* Preview */}
-
-      {preview && (
-        <div className="mt-8 flex justify-center">
-
-          <img
-            src={preview}
-            alt="Preview"
-            className="max-h-80 rounded-3xl border-4 border-white shadow-xl"
-          />
-
-        </div>
-      )}
-
-      {/* Analyze Button */}
-
-      <button
-        onClick={analyzeImage}
-        disabled={!image || loading}
-        className="mt-8 w-full rounded-xl bg-green-600 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-green-700 disabled:bg-gray-400"
-      >
-        {loading ? "🤖 Analyzing Image..." : "🔍 Analyze Image"}
-      </button>
-
-      {/* Result */}
-
-      {result && (
-        <div className="mt-10 rounded-3xl border border-green-200 bg-green-50 p-8 shadow-lg">
-
-          <h3 className="mb-6 text-2xl font-bold text-green-700">
-            📋 AI Analysis
+          <h3>
+            Upload a Civic Issue
           </h3>
 
-          <div className="max-h-[450px] overflow-y-auto rounded-2xl border border-green-200 bg-white p-6 shadow-inner">
+          <p>
+            Upload a photo of a pothole, garbage,
+            broken streetlight or other civic problem.
+          </p>
 
-            <div className="prose max-w-none prose-headings:text-green-700 prose-headings:font-bold prose-ul:list-disc prose-ol:list-decimal prose-li:my-2 prose-p:my-2">
+          <span className="sb-upload-button">
+            Choose Image
+          </span>
 
-              <ReactMarkdown>
-                {result}
-              </ReactMarkdown>
+          <small>
+            JPG, PNG or JPEG • Max recommended size 10MB
+          </small>
 
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            onChange={handleImage}
+            hidden
+          />
+
+        </label>
+
+      )}
+
+
+      {/* =========================================
+          IMAGE PREVIEW
+      ========================================= */}
+
+      {preview && (
+
+        <div className="sb-image-section">
+
+          <div className="sb-image-header">
+
+            <div>
+              <span className="sb-section-label">
+                UPLOADED IMAGE
+              </span>
+
+              <h3>
+                Civic Issue Photo
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              className="sb-change-image"
+              onClick={resetGenerator}
+              disabled={loading}
+            >
+              ↻ Change Image
+            </button>
+
+          </div>
+
+
+          <div className="sb-image-preview">
+
+            <img
+              src={preview}
+              alt="Uploaded civic issue"
+            />
+
+          </div>
+
+
+          <div className="sb-file-info">
+
+            <div>
+              <strong>
+                {image?.name}
+              </strong>
+
+              <span>
+                {image
+                  ? `${(image.size / 1024 / 1024).toFixed(2)} MB`
+                  : ""}
+              </span>
+            </div>
+
+            <span className="sb-file-ready">
+              ✓ Ready for AI analysis
+            </span>
+
+          </div>
+
+
+          {/* Analyze */}
+
+          <button
+            type="button"
+            onClick={analyzeImage}
+            disabled={loading}
+            className="sb-analyze-button"
+          >
+
+            {loading ? (
+              <>
+                <span className="sb-analysis-spinner"></span>
+                AI is analyzing the image...
+              </>
+            ) : (
+              <>
+                🔍 Analyze Civic Issue
+                <span>→</span>
+              </>
+            )}
+
+          </button>
+
+
+          {/* Thinking */}
+
+          {loading && (
+
+            <div className="sb-analysis-status">
+
+              <div className="sb-analysis-icon">
+                🤖
+              </div>
+
+              <div>
+
+                <strong>
+                  Smart Bharat AI is analyzing
+                </strong>
+
+                <p>
+                  Identifying the issue, department,
+                  priority and recommended action...
+                </p>
+
+              </div>
+
+            </div>
+
+          )}
+
+        </div>
+
+      )}
+
+
+      {/* =========================================
+          AI RESULT
+      ========================================= */}
+
+      {result && !loading && (
+
+        <div className="sb-analysis-result">
+
+          {/* Result Header */}
+
+          <div className="sb-result-header">
+
+            <div className="sb-result-title">
+
+              <div className="sb-result-icon">
+                🤖
+              </div>
+
+              <div>
+                <span>
+                  AI ANALYSIS COMPLETE
+                </span>
+
+                <h3>
+                  Civic Issue Report
+                </h3>
+              </div>
+
+            </div>
+
+            <div className="sb-result-status">
+              ✓ Generated
             </div>
 
           </div>
 
-          {/* Action Buttons */}
 
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* Result Content */}
+
+          <div className="sb-result-content">
+
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => (
+                  <h2 className="sb-result-heading">
+                    {children}
+                  </h2>
+                ),
+
+                h2: ({ children }) => (
+                  <h2 className="sb-result-heading">
+                    {children}
+                  </h2>
+                ),
+
+                h3: ({ children }) => (
+                  <h3 className="sb-result-heading">
+                    {children}
+                  </h3>
+                ),
+
+                p: ({ children }) => (
+                  <p className="sb-result-text">
+                    {children}
+                  </p>
+                ),
+
+                ul: ({ children }) => (
+                  <ul className="sb-result-list">
+                    {children}
+                  </ul>
+                ),
+
+                ol: ({ children }) => (
+                  <ol className="sb-result-list">
+                    {children}
+                  </ol>
+                ),
+
+                li: ({ children }) => (
+                  <li>{children}</li>
+                ),
+              }}
+            >
+              {result}
+            </ReactMarkdown>
+
+          </div>
+
+
+          {/* Actions */}
+
+          <div className="sb-result-actions">
 
             <button
+              type="button"
+              className="sb-copy-button"
               onClick={copyComplaint}
-              className="rounded-xl bg-blue-600 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-blue-700"
             >
               📋 Copy Complaint
             </button>
 
             <button
+              type="button"
+              className="sb-download-button"
               onClick={downloadComplaint}
-              className="rounded-xl bg-green-600 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-green-700"
             >
               ⬇ Download
             </button>
 
             <button
+              type="button"
+              className="sb-save-button"
               onClick={saveComplaint}
-              className="rounded-xl bg-purple-600 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-purple-700"
             >
-              💾 Save
+              💾 Save to History
             </button>
 
           </div>
 
+
+          {/* New analysis */}
+
+          <button
+            type="button"
+            className="sb-new-analysis"
+            onClick={resetGenerator}
+          >
+            ↻ Analyze Another Image
+          </button>
+
         </div>
+
       )}
 
     </div>

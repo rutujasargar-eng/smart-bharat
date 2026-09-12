@@ -9,168 +9,198 @@ import Footer from "../components/Footer";
 function Home() {
   const [page, setPage] = useState("home");
 
+  const goHome = () => {
+    setPage("home");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-sky-100">
+    <div className="app-shell">
 
-      <Navbar />
+      <Navbar page={page} setPage={setPage} />
 
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <main className="main-container">
 
-        {/* Dashboard */}
-        <section className="bg-white rounded-3xl shadow-xl p-8 border">
-          <Hero setPage={setPage} />
-        </section>
+        {/* HOME */}
+        {page === "home" && (
+          <>
+            <Hero setPage={setPage} />
 
-        {/* AI Assistant */}
+            <section className="trust-section">
+              <div className="trust-content">
+                <span className="trust-icon">🇮🇳</span>
+
+                <div>
+                  <h3>Technology for Citizens</h3>
+                  <p>
+                    Making government services simpler, smarter and more
+                    accessible with Artificial Intelligence.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* AI ASSISTANT */}
         {page === "assistant" && (
-          <section
-            id="assistant"
-            className="bg-white rounded-3xl shadow-xl p-8 border"
-          >
+          <section className="feature-page">
 
-            <div className="flex justify-between items-center mb-5 border-b pb-3">
-
+            <div className="page-header">
               <div>
-                <h2 className="text-3xl font-bold text-blue-700">
-                  🤖 AI Government Assistant
-                </h2>
+                <span className="page-badge">AI SERVICE</span>
 
-                <p className="text-gray-500">
-                  Ask anything about Government Services, Schemes and Documents.
+                <h2>🤖 AI Government Assistant</h2>
+
+                <p>
+                  Ask questions about government schemes, services,
+                  documents and citizen benefits.
                 </p>
               </div>
 
-              <button
-                onClick={() => setPage("home")}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-xl"
-              >
-                🏠 Home
+              <button className="home-button" onClick={goHome}>
+                ← Back Home
               </button>
-
             </div>
 
-            <ChatBot />
+            <div className="feature-content">
+              <ChatBot />
+            </div>
 
           </section>
         )}
 
-        {/* Complaint Generator */}
+        {/* COMPLAINT GENERATOR */}
         {page === "complaint" && (
-          <section
-            id="complaint"
-            className="bg-white rounded-3xl shadow-xl p-8 border"
-          >
+          <section className="feature-page">
 
-            <div className="flex justify-between items-center mb-5 border-b pb-3">
-
+            <div className="page-header">
               <div>
-                <h2 className="text-3xl font-bold text-green-700">
-                  📷 AI Complaint Generator
-                </h2>
+                <span className="page-badge complaint-badge">
+                  AI CIVIC SERVICE
+                </span>
 
-                <p className="text-gray-500">
-                  Upload an image and let AI generate a complaint automatically.
+                <h2>📷 AI Complaint Generator</h2>
+
+                <p>
+                  Upload a civic issue image and let AI analyze the problem
+                  and generate a professional complaint.
                 </p>
               </div>
 
-              <button
-                onClick={() => setPage("home")}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-xl"
-              >
-                🏠 Home
+              <button className="home-button" onClick={goHome}>
+                ← Back Home
               </button>
-
             </div>
 
-            <ComplaintGenerator />
+            <div className="feature-content">
+              <ComplaintGenerator />
+            </div>
 
           </section>
         )}
 
-        {/* Complaint History */}
+        {/* HISTORY */}
         {page === "history" && (
-          <section
-            id="history"
-            className="bg-white rounded-3xl shadow-xl p-8 border"
-          >
+          <section className="feature-page">
 
-            <div className="flex justify-between items-center mb-5 border-b pb-3">
-
+            <div className="page-header">
               <div>
-                <h2 className="text-3xl font-bold text-purple-700">
-                  📜 Complaint History
-                </h2>
+                <span className="page-badge history-badge">
+                  CITIZEN RECORDS
+                </span>
 
-                <p className="text-gray-500">
-                  View all complaints saved during this session.
+                <h2>📜 Complaint History</h2>
+
+                <p>
+                  View complaints generated and saved during your session.
                 </p>
               </div>
 
-              <button
-                onClick={() => setPage("home")}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-xl"
-              >
-                🏠 Home
+              <button className="home-button" onClick={goHome}>
+                ← Back Home
               </button>
-
             </div>
 
-            <ComplaintHistory />
+            <div className="feature-content">
+              <ComplaintHistory />
+            </div>
 
           </section>
         )}
 
-        {/* About */}
+        {/* ABOUT */}
         {page === "about" && (
-          <section className="bg-white rounded-3xl shadow-xl p-8 border">
+          <section className="feature-page">
 
-            <div className="flex justify-between items-center mb-8">
+            <div className="page-header">
+              <div>
+                <span className="page-badge about-badge">
+                  ABOUT THE PROJECT
+                </span>
 
-              <h2 className="text-3xl font-bold text-orange-600">
-                ℹ️ About Smart Bharat
-              </h2>
+                <h2>🇮🇳 About Smart Bharat</h2>
 
-              <button
-                onClick={() => setPage("home")}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-xl"
-              >
-                🏠 Home
-              </button>
-
-            </div>
-
-            <p className="text-lg text-gray-700 leading-8">
-              Smart Bharat is an AI-powered platform that helps citizens access
-              government services, generate complaints from images using AI,
-              and maintain complaint history in one place.
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-6 mt-8">
-
-              <div className="bg-blue-50 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-blue-700 mb-3">
-                  🚀 Tech Stack
-                </h3>
-
-                <ul className="list-disc ml-6 space-y-2">
-                  <li>React + Vite</li>
-                  <li>Tailwind CSS</li>
-                  <li>Google Gemini AI</li>
-                  <li>Local Storage</li>
-                </ul>
+                <p>
+                  An AI-powered civic platform designed to make citizen
+                  services easier and more accessible.
+                </p>
               </div>
 
-              <div className="bg-green-50 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-green-700 mb-3">
-                  ⭐ Features
-                </h3>
+              <button className="home-button" onClick={goHome}>
+                ← Back Home
+              </button>
+            </div>
 
-                <ul className="list-disc ml-6 space-y-2">
-                  <li>AI Government Assistant</li>
-                  <li>AI Complaint Generator</li>
-                  <li>Complaint History</li>
-                  <li>Multi-language Support</li>
-                </ul>
+            <div className="about-grid">
+
+              <div className="about-card">
+                <div className="about-icon">🚀</div>
+
+                <h3>Our Vision</h3>
+
+                <p>
+                  Smart Bharat combines Artificial Intelligence with
+                  citizen-focused technology to simplify access to government
+                  information and civic complaint services.
+                </p>
+              </div>
+
+              <div className="about-card">
+                <div className="about-icon">🧠</div>
+
+                <h3>AI Powered</h3>
+
+                <p>
+                  Google Gemini AI is used to answer government-service
+                  questions and analyze uploaded civic issue images.
+                </p>
+              </div>
+
+              <div className="about-card">
+                <div className="about-icon">📱</div>
+
+                <h3>Citizen Friendly</h3>
+
+                <p>
+                  The platform is designed with a simple interface so that
+                  citizens can quickly find information and report issues.
+                </p>
+              </div>
+
+              <div className="about-card">
+                <div className="about-icon">💻</div>
+
+                <h3>Technology Stack</h3>
+
+                <div className="tech-list">
+                  <span>React</span>
+                  <span>Vite</span>
+                  <span>Google Gemini AI</span>
+                  <span>JavaScript</span>
+                  <span>CSS</span>
+                  <span>Local Storage</span>
+                </div>
               </div>
 
             </div>

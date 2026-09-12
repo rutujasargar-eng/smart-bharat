@@ -3,20 +3,14 @@ import ReactMarkdown from "react-markdown";
 
 export default function ComplaintHistory() {
   const [history, setHistory] = useState([]);
-
-  function loadHistory() {
-    const complaints =
-      JSON.parse(localStorage.getItem("complaints")) || [];
-
-    setHistory(complaints);
-  }
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   useEffect(() => {
     loadHistory();
 
-    function handleUpdate() {
+    const handleUpdate = () => {
       loadHistory();
-    }
+    };
 
     window.addEventListener("complaintsUpdated", handleUpdate);
 
@@ -25,24 +19,172 @@ export default function ComplaintHistory() {
     };
   }, []);
 
+  function loadHistory() {
+    const complaints =
+      JSON.parse(localStorage.getItem("complaints")) || [];
+
+    setHistory(complaints);
+  }
+
   function clearHistory() {
-    if (!window.confirm("Clear all complaint history?")) return;
+    if (!window.confirm("Clear all complaint history?")) {
+      return;
+    }
 
     localStorage.removeItem("complaints");
     setHistory([]);
+    setSelectedComplaint(null);
 
     window.dispatchEvent(new Event("complaintsUpdated"));
   }
 
-  return (
-    <div className="max-w-5xl mx-auto">
+  function openComplaint(item, index) {
+    setSelectedComplaint({
+      ...item,
+      number: history.length - index,
+    });
 
-      <div className="flex justify-end mb-6">
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  function backToHistory() {
+    setSelectedComplaint(null);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  /* =========================================
+     FULL COMPLAINT
+  ========================================= */
+
+  if (selectedComplaint) {
+    return (
+      <div className="sb-detail-page">
+
+        <button
+          type="button"
+          className="sb-back-button"
+          onClick={backToHistory}
+        >
+          ← Back to History
+        </button>
+
+        <div className="sb-detail-card">
+
+          <div className="sb-detail-top">
+
+            <div>
+              <div className="sb-detail-label">
+                🚨 SAVED COMPLAINT
+              </div>
+
+              <h2>
+                Complaint #{selectedComplaint.number}
+              </h2>
+            </div>
+
+            <div className="sb-detail-date">
+              📅 {selectedComplaint.date}
+            </div>
+
+          </div>
+
+          <div className="sb-detail-body">
+
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => (
+                  <h2 className="sb-detail-heading">
+                    {children}
+                  </h2>
+                ),
+
+                h2: ({ children }) => (
+                  <h2 className="sb-detail-heading">
+                    {children}
+                  </h2>
+                ),
+
+                h3: ({ children }) => (
+                  <h3 className="sb-detail-heading">
+                    {children}
+                  </h3>
+                ),
+
+                p: ({ children }) => (
+                  <p className="sb-detail-text">
+                    {children}
+                  </p>
+                ),
+
+                ul: ({ children }) => (
+                  <ul className="sb-detail-list">
+                    {children}
+                  </ul>
+                ),
+
+                ol: ({ children }) => (
+                  <ol className="sb-detail-list">
+                    {children}
+                  </ol>
+                ),
+
+                li: ({ children }) => (
+                  <li>{children}</li>
+                ),
+              }}
+            >
+              {selectedComplaint.complaint}
+            </ReactMarkdown>
+
+          </div>
+
+          <div className="sb-detail-footer">
+            ✓ Saved in your Smart Bharat session history
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  /* =========================================
+     HISTORY LIST
+  ========================================= */
+
+  return (
+    <div className="sb-history-container">
+
+      {/* HEADER */}
+
+      <div className="sb-history-header">
+
+        <div>
+          <h3>
+            📋 Saved Complaints
+          </h3>
+
+          <p>
+            {history.length}{" "}
+            {history.length === 1
+              ? "complaint"
+              : "complaints"}{" "}
+            saved during this session.
+          </p>
+        </div>
 
         {history.length > 0 && (
           <button
+            type="button"
+            className="sb-clear-button"
             onClick={clearHistory}
-            className="rounded-xl bg-red-600 px-5 py-2 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-red-700"
           >
             🗑 Clear History
           </button>
@@ -50,53 +192,118 @@ export default function ComplaintHistory() {
 
       </div>
 
+
+      {/* EMPTY */}
+
       {history.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-purple-200 bg-purple-50 py-12 text-center">
 
-          <div className="text-6xl mb-4">📭</div>
+        <div className="sb-empty">
 
-          <h3 className="text-xl font-bold text-purple-700">
+          <div className="sb-empty-icon">
+            📭
+          </div>
+
+          <h3>
             No Complaints Saved
           </h3>
 
-          <p className="mt-2 text-gray-500">
-            Save a complaint and it will appear here.
+          <p>
+            Generate and save a complaint from the AI
+            Complaint Generator and it will appear here.
           </p>
 
         </div>
+
       ) : (
-        <div className="space-y-6 max-h-[650px] overflow-y-auto pr-2">
 
-          {history.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-2xl border border-purple-200 bg-purple-50 p-6 shadow-md transition-all duration-300 hover:shadow-xl"
-            >
+        <div className="sb-complaint-list">
 
-              <div className="mb-4 flex items-center justify-between">
+          {history.map((item, index) => {
 
-                <span className="rounded-full bg-purple-700 px-4 py-1 text-sm font-semibold text-white">
-                  📅 {item.date}
-                </span>
+            const number = history.length - index;
 
-              </div>
+            return (
+              <div
+                className="sb-complaint-card"
+                key={item.id || index}
+              >
 
-              <div className="rounded-xl bg-white p-5 shadow-inner">
+                {/* TOP */}
 
-                <div className="prose max-w-none prose-headings:text-purple-700 prose-headings:font-bold prose-ul:list-disc prose-ol:list-decimal prose-li:my-2 prose-p:my-2">
+                <div className="sb-card-header">
 
-                  <ReactMarkdown>
+                  <div className="sb-card-title">
+                    🚨 Complaint #{number}
+                  </div>
+
+                  <div className="sb-card-date">
+                    📅 {item.date}
+                  </div>
+
+                </div>
+
+
+                {/* PREVIEW */}
+
+                <div className="sb-card-preview">
+
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ children }) => (
+                        <h3 className="sb-preview-heading">
+                          {children}
+                        </h3>
+                      ),
+
+                      h2: ({ children }) => (
+                        <h3 className="sb-preview-heading">
+                          {children}
+                        </h3>
+                      ),
+
+                      h3: ({ children }) => (
+                        <h3 className="sb-preview-heading">
+                          {children}
+                        </h3>
+                      ),
+
+                      p: ({ children }) => (
+                        <p className="sb-preview-text">
+                          {children}
+                        </p>
+                      ),
+                    }}
+                  >
                     {item.complaint}
                   </ReactMarkdown>
 
                 </div>
 
-              </div>
 
-            </div>
-          ))}
+                {/* BOTTOM */}
+
+                <div className="sb-card-footer">
+
+                  <span className="sb-saved">
+                    ✓ Saved
+                  </span>
+
+                  <button
+                    type="button"
+                    className="sb-read-more"
+                    onClick={() => openComplaint(item, index)}
+                  >
+                    Read More →
+                  </button>
+
+                </div>
+
+              </div>
+            );
+          })}
 
         </div>
+
       )}
 
     </div>

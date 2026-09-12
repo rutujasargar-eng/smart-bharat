@@ -1,82 +1,119 @@
 function Hero({ setPage }) {
+
+  const features = [
+    {
+      id: "assistant",
+      icon: "✦",
+      title: "AI Government Assistant",
+      description:
+        "Get instant answers about government schemes, services and required documents.",
+      className: "blue-card",
+    },
+    {
+      id: "complaint",
+      icon: "⚠",
+      title: "AI Complaint Generator",
+      description:
+        "Upload a civic issue image and generate a professional complaint using AI.",
+      className: "orange-card",
+    },
+    {
+      id: "history",
+      icon: "▣",
+      title: "Complaint History",
+      description:
+        "Keep track of complaints generated during your current session.",
+      className: "purple-card",
+    },
+    {
+      id: "about",
+      icon: "ⓘ",
+      title: "About Smart Bharat",
+      description:
+        "Learn how AI and modern web technology power this civic platform.",
+      className: "green-card",
+    },
+  ];
+
   return (
-    <section className="py-8">
+    <section className="hero">
 
-      <div className="text-center mb-12">
+      {/* Background decorations */}
+      <div className="hero-glow glow-one"></div>
+      <div className="hero-glow glow-two"></div>
 
-        <h2 className="text-4xl font-extrabold text-slate-800">
-          AI Powered Government Services
-          <br />
-          & Civic Complaint Platform
-        </h2>
+      {/* Badge */}
+      <div className="hero-badge">
+        <span>🇮🇳</span>
+        BUILT FOR SMART INDIA
+      </div>
 
-        <p className="mt-4 text-lg text-gray-600">
-          Choose any feature below to get started.
-        </p>
+      {/* Heading */}
+      <h1>
+        AI-Powered Civic Services
+        <br />
+        <span>for a Smarter Bharat.</span>
+      </h1>
+
+      <p className="hero-description">
+        Access government information, understand civic services and
+        generate complaints using the power of Artificial Intelligence.
+      </p>
+
+      {/* CTA */}
+      <div className="hero-actions">
+
+        <button
+          className="primary-button"
+          onClick={() => setPage("assistant")}
+        >
+          ✦ Ask AI Assistant
+          <span>→</span>
+        </button>
+
+        <button
+          className="secondary-button"
+          onClick={() => setPage("complaint")}
+        >
+          Report a Civic Issue
+        </button>
 
       </div>
 
-      <div className="mt-10 flex flex-wrap justify-center gap-8">
+      {/* Feature heading */}
+      <div className="features-heading">
+        <span>EXPLORE SERVICES</span>
+        <h2>Everything you need in one place</h2>
+      </div>
 
-        <button
-          onClick={() => setPage("assistant")}
-          className="w-72 rounded-2xl bg-blue-600 px-6 py-8 text-white shadow-lg transition duration-300 hover:scale-105 hover:bg-blue-700"
-        >
-          <div className="text-5xl">🤖</div>
+      {/* Cards */}
+      <div className="feature-grid">
 
-          <h2 className="mt-4 text-2xl font-bold">
-            AI Assistant
-          </h2>
+        {features.map((feature) => (
+          <button
+            key={feature.id}
+            onClick={() => setPage(feature.id)}
+            className={`feature-card ${feature.className}`}
+          >
 
-          <p className="mt-3 text-blue-100">
-            Government Schemes & Services
-          </p>
-        </button>
+            <div className="feature-icon">
+              {feature.icon}
+            </div>
 
-        <button
-          onClick={() => setPage("complaint")}
-          className="w-72 rounded-2xl bg-green-600 px-6 py-8 text-white shadow-lg transition duration-300 hover:scale-105 hover:bg-green-700"
-        >
-          <div className="text-5xl">📷</div>
+            <div className="feature-arrow">
+              ↗
+            </div>
 
-          <h2 className="mt-4 text-2xl font-bold">
-            Complaint
-          </h2>
+            <h3>{feature.title}</h3>
 
-          <p className="mt-3 text-green-100">
-            Upload Image & Generate
-          </p>
-        </button>
+            <p>{feature.description}</p>
 
-        <button
-          onClick={() => setPage("history")}
-          className="w-72 rounded-2xl bg-purple-600 px-6 py-8 text-white shadow-lg transition duration-300 hover:scale-105 hover:bg-purple-700"
-        >
-          <div className="text-5xl">📜</div>
+            <span className="learn-more">
+              Explore service →
+            </span>
 
-          <h2 className="mt-4 text-2xl font-bold">
-            History
-          </h2>
-
-          <p className="mt-3 text-purple-100">
-            Saved Complaints
-          </p>
-        </button>
-
-        <button
-          onClick={() => setPage("about")}
-          className="w-72 rounded-2xl bg-orange-500 px-6 py-8 text-white shadow-lg transition duration-300 hover:scale-105 hover:bg-orange-600"
-        >
-          <div className="text-5xl">ℹ️</div>
-
-          <h2 className="mt-4 text-2xl font-bold">
-            About
-          </h2>
-
-          <p className="mt-3 text-orange-100">
-            Project Details
-          </p>
-        </button>
+          </button>
+        ))}
 
       </div>
 
